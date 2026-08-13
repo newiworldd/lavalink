@@ -27,14 +27,19 @@ proxy.on('error', function(err, req, res) {
 
 // 3. Create Web Server to handle root HTML + Lavalink WebSocket/API
 var server = http.createServer(function(req, res) {
+    var reqPath = req.url.split('?')[0];
+
     // Ping endpoint for real-time latency checks
-    if (req.url === '/ping') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+    if (reqPath === '/ping') {
+        res.writeHead(200, { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+        });
         return res.end(JSON.stringify({ status: 'ok', timestamp: Date.now() }));
     }
 
     // If user opens the website in browser (Root path "/")
-    if (req.url === '/' || req.url === '/index.html') {
+    if (reqPath === '/' || reqPath === '/index.html') {
         fs.readFile(path.join(__dirname, 'index.html'), function(err, data) {
             if (err) {
                 res.writeHead(500);

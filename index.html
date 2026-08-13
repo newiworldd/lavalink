@@ -194,8 +194,11 @@
             const pingEl = document.getElementById('ping-value');
             const start = performance.now();
             try {
-                const response = await fetch('/ping?t=' + Date.now(), { cache: 'no-store' });
-                if (response.ok) {
+                let response = await fetch('/ping?t=' + Date.now(), { cache: 'no-store' });
+                if (!response.ok) {
+                    response = await fetch('/?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+                }
+                if (response.ok || response.status === 304) {
                     const latency = Math.round(performance.now() - start);
                     pingEl.innerText = latency + ' ms';
                     if (latency < 80) {
