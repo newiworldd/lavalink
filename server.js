@@ -15,11 +15,11 @@ lavalink.on('exit', function(code) {
     console.log('[Runner] Lavalink exited with code ' + code);
 });
 
-// 2. Create Proxy Server
-var proxy = httpProxy.createProxyServer({});
+// 2. Create Proxy Server with WebSocket support
+var proxy = httpProxy.createProxyServer({ ws: true });
 
 proxy.on('error', function(err, req, res) {
-    if (res.writeHead) {
+    if (res && res.writeHead) {
         res.writeHead(502, { 'Content-Type': 'text/plain' });
         res.end('Lavalink is starting up or unavailable. Please refresh in a few seconds.');
     }
