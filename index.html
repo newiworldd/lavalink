@@ -115,8 +115,8 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             margin-bottom: 30px;
         }
 
@@ -124,18 +124,19 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 14px;
-            padding: 16px;
+            padding: 14px 8px;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #8A5CFF;
+            transition: color 0.3s ease;
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #64748b;
             margin-top: 4px;
             text-transform: uppercase;
@@ -177,11 +178,45 @@
                 <div class="stat-value">Active</div>
                 <div class="stat-label">System State</div>
             </div>
+            <div class="stat-box">
+                <div class="stat-value" id="ping-value">-- ms</div>
+                <div class="stat-label">Real-time Ping</div>
+            </div>
         </div>
 
         <div class="footer">
             Powered by <span>AxC Music Core</span>
         </div>
     </div>
+
+    <script>
+        async function checkPing() {
+            const pingEl = document.getElementById('ping-value');
+            const start = performance.now();
+            try {
+                const response = await fetch('/ping?t=' + Date.now(), { cache: 'no-store' });
+                if (response.ok) {
+                    const latency = Math.round(performance.now() - start);
+                    pingEl.innerText = latency + ' ms';
+                    if (latency < 80) {
+                        pingEl.style.color = '#10b981'; // Green
+                    } else if (latency < 200) {
+                        pingEl.style.color = '#f59e0b'; // Yellow/Orange
+                    } else {
+                        pingEl.style.color = '#ef4444'; // Red
+                    }
+                } else {
+                    pingEl.innerText = 'Error';
+                    pingEl.style.color = '#ef4444';
+                }
+            } catch (err) {
+                pingEl.innerText = 'Offline';
+                pingEl.style.color = '#ef4444';
+            }
+        }
+
+        checkPing();
+        setInterval(checkPing, 2000);
+    </script>
 </body>
 </html>
